@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate JavaScript
+        run: node --check extension.js
+
+      - name: Validate JSON
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('syntaxes/java-mybatis-inline-sql.tmLanguage.json', 'utf8'))"
+
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+
+      - name: List package files
+        run: vsce ls --no-dependencies --tree
+
+      - name: Package VSIX
+        run: vsce package --no-dependencies

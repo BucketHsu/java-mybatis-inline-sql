@@ -4,7 +4,9 @@
 
 Highlight SQL inside Java MyBatis annotation text blocks.
 
-This extension is a VS Code TextMate grammar injection for Java files. It injects SQL highlighting into Java text blocks used directly in MyBatis mapper annotations, and also supports an optional manual `/*sql*/` marker.
+This extension uses a VS Code TextMate grammar injection for Java files. It injects SQL highlighting into Java text blocks used directly in MyBatis mapper annotations, and also supports an optional manual `/*sql*/` marker.
+
+It also includes a small runtime feature for MyBatis `<script>` text blocks: XML entities such as `&lt;` can show their decoded character in gray text, and completion items can help insert XML entity forms.
 
 ## Features
 
@@ -15,7 +17,10 @@ This extension is a VS Code TextMate grammar injection for Java files. It inject
   - `@Delete`
 - Highlights SQL inside Java text blocks marked with `/*sql*/`, `/* sql */`, or `/*   sql   */`.
 - Works through TextMate grammar injection into `source.java`.
-- Does not require a language server or extension runtime code.
+- Shows decoded hints beside XML entities inside Java text blocks wrapped with `<script>` and `</script>`.
+- Provides completion items for XML entities inside `<script>` text blocks.
+- Provides commands to encode or decode XML entities in the selected text.
+- Does not require a language server.
 
 ## Supported Examples
 
@@ -73,6 +78,15 @@ public interface UserMapper {
         WHERE EMPNO = #{empno}
     """)
     String query(@Param("empno") String empno);
+
+    @Select("""
+        <script>
+        SELECT *
+        FROM SYSSA_USER
+        WHERE CREATE_TIME &lt; #{beforeTime}
+        </script>
+    """)
+    List<User> findBefore(@Param("beforeTime") String beforeTime);
 }
 ```
 
@@ -85,6 +99,54 @@ The main use case is automatic highlighting for MyBatis annotations without writ
 3. In the Extension Development Host, open a `.java` file.
 4. Paste the mapper example above.
 5. Confirm that SQL inside the matching Java text blocks receives SQL syntax highlighting.
+
+## XML Entity Helpers
+
+When a Java text block contains both `<script>` and `</script>`, this extension can show decoded XML entities beside the source text:
+
+```java
+@Select("""
+    <script>
+    SELECT *
+    FROM SYSSA_USER
+    WHERE CREATE_TIME &lt; #{beforeTime}
+    </script>
+""")
+```
+
+In this example, `&lt;` can show a gray `<` hint beside it.
+
+Inside a `<script>` text block, typing `<` or `&` can show completion items for:
+
+- `&lt;`
+- `&lt;=`
+- `&gt;`
+- `&gt;=`
+- `&amp;`
+- `&amp;&amp;`
+- `&quot;`
+- `&apos;`
+
+The command palette also includes:
+
+- `Java MyBatis Inline SQL: Encode XML Entities`
+- `Java MyBatis Inline SQL: Decode XML Entities`
+
+Select text first, then run one of these commands.
+
+The extension reports warnings with quick fixes for XML characters that commonly break MyBatis `<script>` SQL:
+
+- `<` -> `&lt;`
+- `<=` -> `&lt;=`
+- `&` -> `&amp;`
+- `&&` -> `&amp;&amp;`
+
+The following forms are also available through completion and manual selection conversion, but are not reported as warnings by default because `>` is usually valid in XML text nodes:
+
+- `>` -> `&gt;`
+- `>=` -> `&gt;=`
+- `"` -> `&quot;`
+- `'` -> `&apos;`
 
 ## Package and Install Locally
 
@@ -103,7 +165,7 @@ vsce package
 Install the generated VSIX:
 
 ```bash
-code --install-extension java-mybatis-inline-sql-0.0.1.vsix
+code --install-extension java-mybatis-inline-sql-0.0.3.vsix
 ```
 
 Notes for packaging:
@@ -118,7 +180,7 @@ Notes for packaging:
 - It is not a SQL formatter.
 - It is not a SQL validator.
 - It is not a MyBatis parser.
-- It does not provide autocomplete.
+- XML entity completion is limited to Java text blocks that contain both `<script>` and `</script>`.
 - It does not support `@SelectProvider`, `@InsertProvider`, `@UpdateProvider`, or `@DeleteProvider`.
 - It does not support `@Select({"SELECT ..."})`, string concatenation, variables, or constants such as `@Select(SQL_FIND_USER)`.
 - MyBatis placeholders such as `#{empno}` and `${name}` are left as normal SQL text.

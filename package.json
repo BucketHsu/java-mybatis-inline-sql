@@ -2,9 +2,15 @@
   "name": "java-mybatis-inline-sql",
   "displayName": "Java MyBatis Inline SQL",
   "description": "Highlight SQL inside Java MyBatis annotation text blocks.",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "publisher": "local",
   "license": "MIT",
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:java",
+    "onCommand:javaMybatisInlineSql.encodeXmlEntities",
+    "onCommand:javaMybatisInlineSql.decodeXmlEntities"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/your-name/java-mybatis-inline-sql.git"
@@ -16,6 +22,16 @@
     "Programming Languages"
   ],
   "contributes": {
+    "commands": [
+      {
+        "command": "javaMybatisInlineSql.encodeXmlEntities",
+        "title": "Java MyBatis Inline SQL: Encode XML Entities"
+      },
+      {
+        "command": "javaMybatisInlineSql.decodeXmlEntities",
+        "title": "Java MyBatis Inline SQL: Decode XML Entities"
+      }
+    ],
     "grammars": [
       {
         "scopeName": "inline.java-mybatis-sql",

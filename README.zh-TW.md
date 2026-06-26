@@ -4,7 +4,9 @@
 
 在 Java MyBatis annotation 的 text block 內提供 SQL 語法高亮。
 
-這個 extension 是給 VS Code 使用的 TextMate grammar injection。它會在 Java 檔案中，將直接寫在 MyBatis mapper annotation 裡的 Java text block 當成 SQL 高亮；同時也保留選用的 `/*sql*/` 手動標記模式。
+這個 extension 使用 VS Code TextMate grammar injection。它會在 Java 檔案中，將直接寫在 MyBatis mapper annotation 裡的 Java text block 當成 SQL 高亮；同時也保留選用的 `/*sql*/` 手動標記模式。
+
+它也包含一個很小的 runtime 功能：在 MyBatis `<script>` text block 裡，像 `&lt;` 這類 XML entity 可以在旁邊顯示灰色的解碼結果，也可以透過 completion 輔助輸入 XML entity。
 
 ## 功能
 
@@ -15,7 +17,10 @@
   - `@Delete`
 - 高亮以 `/*sql*/`、`/* sql */` 或 `/*   sql   */` 標記的 Java text block。
 - 透過 TextMate grammar injection 注入到 `source.java`。
-- 不需要 Language Server，也不需要 extension runtime 程式。
+- 在包含 `<script>` 與 `</script>` 的 Java text block 中，於 XML entity 旁邊顯示解碼後的灰色提示。
+- 在 `<script>` text block 中提供 XML entity completion。
+- 提供選取文字後轉換 XML entity / 還原 XML entity 的命令。
+- 不需要 Language Server。
 
 ## 支援範例
 
@@ -73,6 +78,15 @@ public interface UserMapper {
         WHERE EMPNO = #{empno}
     """)
     String query(@Param("empno") String empno);
+
+    @Select("""
+        <script>
+        SELECT *
+        FROM SYSSA_USER
+        WHERE CREATE_TIME &lt; #{beforeTime}
+        </script>
+    """)
+    List<User> findBefore(@Param("beforeTime") String beforeTime);
 }
 ```
 
@@ -85,6 +99,54 @@ public interface UserMapper {
 3. 在 Extension Development Host 視窗中開啟 `.java` 檔案。
 4. 貼上上方 Mapper 範例。
 5. 確認符合規則的 Java text block 內容有 SQL 語法高亮。
+
+## XML Entity 輔助功能
+
+當 Java text block 同時包含 `<script>` 與 `</script>` 時，這個 extension 會在 XML entity 旁邊顯示解碼後的灰色提示：
+
+```java
+@Select("""
+    <script>
+    SELECT *
+    FROM SYSSA_USER
+    WHERE CREATE_TIME &lt; #{beforeTime}
+    </script>
+""")
+```
+
+以上範例中的 `&lt;` 旁邊會顯示灰色的 `<` 提示。
+
+在 `<script>` text block 中輸入 `<` 或 `&` 時，會提供以下 XML entity completion：
+
+- `&lt;`
+- `&lt;=`
+- `&gt;`
+- `&gt;=`
+- `&amp;`
+- `&amp;&amp;`
+- `&quot;`
+- `&apos;`
+
+命令面板也提供：
+
+- `Java MyBatis Inline SQL: Encode XML Entities`
+- `Java MyBatis Inline SQL: Decode XML Entities`
+
+請先選取文字，再執行上述命令。
+
+這個 extension 會針對 MyBatis `<script>` SQL 中常見、容易造成 XML 解析錯誤的字元顯示 warning，並提供 quick fix：
+
+- `<` -> `&lt;`
+- `<=` -> `&lt;=`
+- `&` -> `&amp;`
+- `&&` -> `&amp;&amp;`
+
+以下寫法也支援 completion 與選取文字後手動轉換，但預設不顯示 warning，因為 `>` 在 XML 文字節點中通常可以直接使用：
+
+- `>` -> `&gt;`
+- `>=` -> `&gt;=`
+- `"` -> `&quot;`
+- `'` -> `&apos;`
 
 ## 本機打包與安裝
 
@@ -103,7 +165,7 @@ vsce package
 安裝產生的 VSIX：
 
 ```bash
-code --install-extension java-mybatis-inline-sql-0.0.1.vsix
+code --install-extension java-mybatis-inline-sql-0.0.3.vsix
 ```
 
 打包注意事項：
@@ -118,7 +180,7 @@ code --install-extension java-mybatis-inline-sql-0.0.1.vsix
 - 它不是 SQL formatter。
 - 它不是 SQL validator。
 - 它不是 MyBatis parser。
-- 它不提供 autocomplete。
+- XML entity completion 只會在同時包含 `<script>` 與 `</script>` 的 Java text block 中啟用。
 - 不支援 `@SelectProvider`、`@InsertProvider`、`@UpdateProvider` 或 `@DeleteProvider`。
 - 不支援 `@Select({"SELECT ..."})`、字串相加、變數或常數，例如 `@Select(SQL_FIND_USER)`。
 - MyBatis placeholder，例如 `#{empno}` 與 `${name}`，目前會維持 SQL 文字處理，不做特別解析。
