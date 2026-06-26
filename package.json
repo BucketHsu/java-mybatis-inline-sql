@@ -1,11 +1,12 @@
 {
-  "name": "java-mybatis-inline-sql",
-  "displayName": "Java MyBatis Inline SQL",
+  "name": "java-mybatis-inline-sql-highlighter",
+  "displayName": "Java MyBatis Inline SQL highlighter",
   "description": "Highlight SQL inside Java MyBatis annotation text blocks.",
-  "version": "0.0.3",
-  "publisher": "local",
+  "version": "0.0.4",
+  "publisher": "BucketHsu",
   "license": "MIT",
   "main": "./extension.js",
+  "icon": "images/icon.png",
   "activationEvents": [
     "onLanguage:java",
     "onCommand:javaMybatisInlineSql.encodeXmlEntities",
@@ -13,7 +14,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-name/java-mybatis-inline-sql.git"
+    "url": "https://github.com/BucketHsu/java-mybatis-inline-sql.git"
   },
   "engines": {
     "vscode": "^1.90.0"
