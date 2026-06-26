@@ -20,6 +20,9 @@ It also includes a small runtime feature for MyBatis `<script>` text blocks: XML
 - Shows decoded hints beside XML entities inside Java text blocks wrapped with `<script>` and `</script>`.
 - Provides completion items for XML entities inside `<script>` text blocks.
 - Provides commands to encode or decode XML entities in the selected text.
+- Highlights MyBatis dynamic SQL tags such as `<script>`, `<choose>`, `<when>`, `<if>`, `<foreach>`, `<where>`, and `<set>`.
+- Highlights MyBatis `#{}` and `${}` placeholders.
+- Provides snippets for common MyBatis annotation text blocks and dynamic SQL tags.
 - Does not require a language server.
 
 ## Supported Examples
@@ -141,12 +144,26 @@ The extension reports warnings with quick fixes for XML characters that commonly
 - `&` -> `&amp;`
 - `&&` -> `&amp;&amp;`
 
+Quick fixes can replace a single unsafe operator, or encode all unsafe XML operators in the current `<script>` block while keeping MyBatis tags such as `<choose>` and `<when>` unchanged.
+
 The following forms are also available through completion and manual selection conversion, but are not reported as warnings by default because `>` is usually valid in XML text nodes:
 
 - `>` -> `&gt;`
 - `>=` -> `&gt;=`
 - `"` -> `&quot;`
 - `'` -> `&apos;`
+
+## Snippets
+
+The extension contributes Java snippets for common MyBatis inline SQL patterns:
+
+- `mbselect`
+- `mbscript`
+- `mbif`
+- `mbchoose`
+- `mbforeach`
+- `mbwhere`
+- `mbset`
 
 ## Package and Install Locally
 
@@ -165,13 +182,13 @@ vsce package
 Install the generated VSIX:
 
 ```bash
-code --install-extension java-mybatis-inline-sql-highlighter-0.0.4.vsix
+code --install-extension java-mybatis-inline-sql-highlighter-0.0.7.vsix
 ```
 
 Notes for packaging:
 
 - Update the `repository.url` in `package.json` before publishing to the Marketplace.
-- The `files` field keeps the VSIX package small and avoids including generated `.vsix` files.
+- The `.vscodeignore` file keeps the VSIX package small and avoids including generated `.vsix` files.
 - `LICENSE` is included so `vsce package` does not warn about a missing license file.
 
 ## Limitations
@@ -181,6 +198,7 @@ Notes for packaging:
 - It is not a SQL validator.
 - It is not a MyBatis parser.
 - XML entity completion is limited to Java text blocks that contain both `<script>` and `</script>`.
+- MyBatis dynamic SQL tags are highlighted as TextMate patterns, not parsed as a full XML document.
 - It does not support `@SelectProvider`, `@InsertProvider`, `@UpdateProvider`, or `@DeleteProvider`.
 - It does not support `@Select({"SELECT ..."})`, string concatenation, variables, or constants such as `@Select(SQL_FIND_USER)`.
 - MyBatis placeholders such as `#{userId}` and `${name}` are left as normal SQL text.

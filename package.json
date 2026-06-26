@@ -1,8 +1,8 @@
 {
   "name": "java-mybatis-inline-sql-highlighter",
-  "displayName": "Java MyBatis Inline SQL highlighter",
+  "displayName": "Java MyBatis Inline SQL Highlighter",
   "description": "Highlight SQL inside Java MyBatis annotation text blocks.",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "publisher": "BucketHsu",
   "license": "MIT",
   "main": "./extension.js",
@@ -22,6 +22,18 @@
   "categories": [
     "Programming Languages"
   ],
+  "keywords": [
+    "java",
+    "mybatis",
+    "sql",
+    "syntax highlighting",
+    "text block",
+    "mapper"
+  ],
+  "galleryBanner": {
+    "color": "#1E1E1E",
+    "theme": "dark"
+  },
   "contributes": {
     "commands": [
       {
@@ -31,6 +43,12 @@
       {
         "command": "javaMybatisInlineSql.decodeXmlEntities",
         "title": "Java MyBatis Inline SQL: Decode XML Entities"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "java",
+        "path": "./snippets/mybatis-inline-sql.code-snippets"
       }
     ],
     "grammars": [

@@ -20,6 +20,9 @@
 - 在包含 `<script>` 與 `</script>` 的 Java text block 中，於 XML entity 旁邊顯示解碼後的灰色提示。
 - 在 `<script>` text block 中提供 XML entity completion。
 - 提供選取文字後轉換 XML entity / 還原 XML entity 的命令。
+- 高亮 `<script>`、`<choose>`、`<when>`、`<if>`、`<foreach>`、`<where>`、`<set>` 等 MyBatis dynamic SQL tag。
+- 高亮 MyBatis `#{}` 與 `${}` placeholder。
+- 提供常用 MyBatis annotation text block 與 dynamic SQL tag snippets。
 - 不需要 Language Server。
 
 ## 支援範例
@@ -141,12 +144,26 @@ public interface UserMapper {
 - `&` -> `&amp;`
 - `&&` -> `&amp;&amp;`
 
+Quick fix 可以只替換單一 unsafe operator，也可以一次轉換目前 `<script>` block 內所有需要 escape 的 XML operator，同時保留 `<choose>`、`<when>` 這類 MyBatis tag。
+
 以下寫法也支援 completion 與選取文字後手動轉換，但預設不顯示 warning，因為 `>` 在 XML 文字節點中通常可以直接使用：
 
 - `>` -> `&gt;`
 - `>=` -> `&gt;=`
 - `"` -> `&quot;`
 - `'` -> `&apos;`
+
+## Snippets
+
+這個 extension 提供以下 Java snippets：
+
+- `mbselect`
+- `mbscript`
+- `mbif`
+- `mbchoose`
+- `mbforeach`
+- `mbwhere`
+- `mbset`
 
 ## 本機打包與安裝
 
@@ -165,13 +182,13 @@ vsce package
 安裝產生的 VSIX：
 
 ```bash
-code --install-extension java-mybatis-inline-sql-highlighter-0.0.4.vsix
+code --install-extension java-mybatis-inline-sql-highlighter-0.0.7.vsix
 ```
 
 打包注意事項：
 
 - 發佈到 Marketplace 前，請先把 `package.json` 裡的 `repository.url` 改成實際 Git repository。
-- `files` 欄位會限制 VSIX 內只放必要檔案，避免把已產生的 `.vsix` 再包進去。
+- `.vscodeignore` 檔案會限制 VSIX 內只放必要檔案，避免把已產生的 `.vsix` 再包進去。
 - 專案已包含 `LICENSE`，因此 `vsce package` 不會再提示缺少授權檔案。
 
 ## 限制
@@ -181,6 +198,7 @@ code --install-extension java-mybatis-inline-sql-highlighter-0.0.4.vsix
 - 它不是 SQL validator。
 - 它不是 MyBatis parser。
 - XML entity completion 只會在同時包含 `<script>` 與 `</script>` 的 Java text block 中啟用。
+- MyBatis dynamic SQL tag 是透過 TextMate pattern 高亮，不是完整 XML parser。
 - 不支援 `@SelectProvider`、`@InsertProvider`、`@UpdateProvider` 或 `@DeleteProvider`。
 - 不支援 `@Select({"SELECT ..."})`、字串相加、變數或常數，例如 `@Select(SQL_FIND_USER)`。
 - MyBatis placeholder，例如 `#{userId}` 與 `${name}`，目前會維持 SQL 文字處理，不做特別解析。

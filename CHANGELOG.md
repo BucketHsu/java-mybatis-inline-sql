@@ -2,6 +2,23 @@
 
 [English](CHANGELOG.md) | [繁體中文](CHANGELOG.zh-TW.md)
 
+## 0.0.7
+
+- Highlight MyBatis dynamic SQL tags and tag attributes inside inline SQL text blocks.
+- Highlight MyBatis `#{}` and `${}` placeholders.
+- Add Java snippets for common MyBatis annotation text blocks and dynamic SQL tags.
+- Add a quick fix to encode all unsafe XML operators in the current `<script>` block.
+
+## 0.0.6
+
+- Polish Marketplace metadata, display name, keywords, and gallery banner.
+- Update local install documentation for the 0.0.6 VSIX package.
+- Align diagnostic source name with the published extension name.
+
+## 0.0.5
+
+- Maintenance release.
+
 ## 0.0.4
 
 - Sanitize documentation examples to use generic table, column, and parameter names.

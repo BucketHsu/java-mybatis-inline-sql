@@ -65,7 +65,98 @@
       "contentName": "meta.embedded.block.sql",
       "patterns": [
         {
+          "include": "#mybatis-tags"
+        },
+        {
+          "include": "#mybatis-placeholders"
+        },
+        {
           "include": "source.sql"
+        }
+      ]
+    },
+    "mybatis-tags": {
+      "name": "meta.tag.mybatis.sql",
+      "begin": "(</?)(script|choose|when|otherwise|if|where|set|trim|foreach|bind)\\b",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.tag.begin.xml"
+        },
+        "2": {
+          "name": "entity.name.tag.mybatis.sql"
+        }
+      },
+      "end": "(/?>)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.tag.end.xml"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#mybatis-attributes"
+        },
+        {
+          "include": "#mybatis-placeholders"
+        }
+      ]
+    },
+    "mybatis-attributes": {
+      "patterns": [
+        {
+          "name": "meta.attribute.mybatis.sql",
+          "match": "\\b(test|collection|item|index|open|close|separator|prefix|suffix|prefixOverrides|suffixOverrides|name|value)\\b\\s*(=)\\s*(\"[^\"]*\"|'[^']*')",
+          "captures": {
+            "1": {
+              "name": "entity.other.attribute-name.mybatis.sql"
+            },
+            "2": {
+              "name": "punctuation.separator.key-value.xml"
+            },
+            "3": {
+              "name": "string.quoted.mybatis.sql"
+            }
+          }
+        }
+      ]
+    },
+    "mybatis-placeholders": {
+      "patterns": [
+        {
+          "name": "meta.placeholder.mybatis.parameter.sql",
+          "match": "(#)(\\{)([^}]*)(\\})",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.variable.mybatis.sql"
+            },
+            "2": {
+              "name": "punctuation.section.braces.begin.mybatis.sql"
+            },
+            "3": {
+              "name": "variable.other.parameter.mybatis.sql"
+            },
+            "4": {
+              "name": "punctuation.section.braces.end.mybatis.sql"
+            }
+          }
+        },
+        {
+          "name": "meta.placeholder.mybatis.substitution.sql",
+          "match": "(\\$)(\\{)([^}]*)(\\})",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.variable.mybatis.sql"
+            },
+            "2": {
+              "name": "punctuation.section.braces.begin.mybatis.sql"
+            },
+            "3": {
+              "name": "variable.other.parameter.mybatis.sql invalid.deprecated.mybatis.sql"
+            },
+            "4": {
+              "name": "punctuation.section.braces.end.mybatis.sql"
+            }
+          }
         }
       ]
     }
