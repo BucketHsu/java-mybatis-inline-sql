@@ -10,7 +10,7 @@ const ENTITIES = [
 
 const ENTITY_TO_CHAR = new Map(ENTITIES.map((item) => [item.entity, item.char]));
 const CHAR_TO_ENTITY = new Map(ENTITIES.map((item) => [item.char, item.entity]));
-const EXTENSION_ID = "java-mybatis-inline-sql";
+const EXTENSION_ID = "java-mybatis-inline-sql-highlighter";
 const ENTITY_COMPLETIONS = [
   { insertText: "&lt;", detail: "XML entity for <", documentation: "Less than." },
   { insertText: "&lt;=", detail: "XML entity for <=", documentation: "Less than or equal." },
@@ -112,6 +112,7 @@ class XmlEntityCompletionProvider {
 class XmlEntityCodeActionProvider {
   provideCodeActions(document, range, context) {
     const actions = [];
+    const blockActionKeys = new Set();
 
     for (const diagnostic of context.diagnostics) {
       if (diagnostic.source !== EXTENSION_ID || diagnostic.code !== "encode-xml-entity") {
@@ -133,6 +134,43 @@ class XmlEntityCodeActionProvider {
       action.diagnostics = [diagnostic];
       action.isPreferred = true;
       actions.push(action);
+
+      const diagnosticOffset = document.offsetAt(diagnostic.range.start);
+      const block = findScriptTextBlockAt(document.getText(), diagnosticOffset);
+      if (!block) {
+        continue;
+      }
+
+      const blockKey = `${block.contentStart}:${block.contentEnd}`;
+      if (blockActionKeys.has(blockKey)) {
+        continue;
+      }
+
+      const content = document.getText(new vscode.Range(
+        document.positionAt(block.contentStart),
+        document.positionAt(block.contentEnd)
+      ));
+      const encodedContent = encodeUnsafeMyBatisScriptText(content);
+      if (encodedContent === content) {
+        continue;
+      }
+
+      const blockAction = new vscode.CodeAction(
+        "Encode XML entities in this <script> block",
+        vscode.CodeActionKind.QuickFix
+      );
+      blockAction.edit = new vscode.WorkspaceEdit();
+      blockAction.edit.replace(
+        document.uri,
+        new vscode.Range(
+          document.positionAt(block.contentStart),
+          document.positionAt(block.contentEnd)
+        ),
+        encodedContent
+      );
+      blockAction.diagnostics = [diagnostic];
+      actions.push(blockAction);
+      blockActionKeys.add(blockKey);
     }
 
     return actions;
@@ -301,6 +339,48 @@ function encodeOperatorText(text) {
   }
 }
 
+function encodeUnsafeMyBatisScriptText(text) {
+  let result = "";
+
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+
+    if (char === "<") {
+      if (isXmlTagStart(text, index)) {
+        result += char;
+        continue;
+      }
+
+      if (text[index + 1] === "=") {
+        result += "&lt;=";
+        index += 1;
+      } else {
+        result += "&lt;";
+      }
+      continue;
+    }
+
+    if (char === "&") {
+      if (isKnownXmlEntity(text, index)) {
+        result += char;
+        continue;
+      }
+
+      if (text.startsWith("&&", index)) {
+        result += "&amp;&amp;";
+        index += 1;
+      } else {
+        result += "&amp;";
+      }
+      continue;
+    }
+
+    result += char;
+  }
+
+  return result;
+}
+
 function decodeXmlEntities(text) {
   return text.replace(/&(lt|gt|amp|quot|apos);/g, (entity) => ENTITY_TO_CHAR.get(entity) || entity);
 }
@@ -333,6 +413,12 @@ function findScriptTextBlocks(text) {
   }
 
   return blocks;
+}
+
+function findScriptTextBlockAt(text, offset) {
+  return findScriptTextBlocks(text).find((block) => {
+    return offset >= block.contentStart && offset <= block.contentEnd;
+  });
 }
 
 function isKnownXmlEntity(text, index) {

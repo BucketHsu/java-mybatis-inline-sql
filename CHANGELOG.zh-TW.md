@@ -2,6 +2,23 @@
 
 [English](CHANGELOG.md) | [繁體中文](CHANGELOG.zh-TW.md)
 
+## 0.0.7
+
+- 在 inline SQL text block 中高亮 MyBatis dynamic SQL tag 與 tag attribute。
+- 高亮 MyBatis `#{}` 與 `${}` placeholder。
+- 新增常用 MyBatis annotation text block 與 dynamic SQL tag Java snippets。
+- 新增 quick fix，可一次轉換目前 `<script>` block 內所有需要 escape 的 XML operator。
+
+## 0.0.6
+
+- 調整 Marketplace metadata、display name、keywords 與 gallery banner。
+- 更新本機安裝文件中的 0.0.6 VSIX 檔名。
+- 將 diagnostics source 名稱調整為與發佈後 extension 名稱一致。
+
+## 0.0.5
+
+- 維護版發佈。
+
 ## 0.0.4
 
 - 將文件範例改為通用的資料表、欄位與參數名稱，避免使用特定環境資訊。
