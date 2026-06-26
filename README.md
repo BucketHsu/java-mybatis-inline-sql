@@ -1,31 +1,31 @@
 # Java MyBatis Inline SQL
 
-[English](README.md) | [繁體中文](README.zh-TW.md)
+[繁體中文](README.md) | [English](README.en.md)
 
-Highlight SQL inside Java MyBatis annotation text blocks.
+在 Java MyBatis annotation 的 text block 內提供 SQL 語法高亮。
 
-This extension uses a VS Code TextMate grammar injection for Java files. It injects SQL highlighting into Java text blocks used directly in MyBatis mapper annotations, and also supports an optional manual `/*sql*/` marker.
+這個 extension 使用 VS Code TextMate grammar injection。它會在 Java 檔案中，將直接寫在 MyBatis mapper annotation 裡的 Java text block 當成 SQL 高亮；同時也保留選用的 `/*sql*/` 手動標記模式。
 
-It also includes a small runtime feature for MyBatis `<script>` text blocks: XML entities such as `&lt;` can show their decoded character in gray text, and completion items can help insert XML entity forms.
+它也包含一個很小的 runtime 功能：在 MyBatis `<script>` text block 裡，像 `&lt;` 這類 XML entity 可以在旁邊顯示灰色的解碼結果，也可以透過 completion 輔助輸入 XML entity。
 
-## Features
+## 功能
 
-- Highlights SQL inside Java text blocks passed directly to:
+- 自動高亮以下 MyBatis annotation 內的 Java text block：
   - `@Select`
   - `@Insert`
   - `@Update`
   - `@Delete`
-- Highlights SQL inside Java text blocks marked with `/*sql*/`, `/* sql */`, or `/*   sql   */`.
-- Works through TextMate grammar injection into `source.java`.
-- Shows decoded hints beside XML entities inside Java text blocks wrapped with `<script>` and `</script>`.
-- Provides completion items for XML entities inside `<script>` text blocks.
-- Provides commands to encode or decode XML entities in the selected text.
-- Highlights MyBatis dynamic SQL tags such as `<script>`, `<choose>`, `<when>`, `<if>`, `<foreach>`, `<where>`, and `<set>`.
-- Highlights MyBatis `#{}` and `${}` placeholders.
-- Provides snippets for common MyBatis annotation text blocks and dynamic SQL tags.
-- Does not require a language server.
+- 高亮以 `/*sql*/`、`/* sql */` 或 `/*   sql   */` 標記的 Java text block。
+- 透過 TextMate grammar injection 注入到 `source.java`。
+- 在包含 `<script>` 與 `</script>` 的 Java text block 中，於 XML entity 旁邊顯示解碼後的灰色提示。
+- 在 `<script>` text block 中提供 XML entity completion。
+- 提供選取文字後轉換 XML entity / 還原 XML entity 的命令。
+- 高亮 `<script>`、`<choose>`、`<when>`、`<if>`、`<foreach>`、`<where>`、`<set>` 等 MyBatis dynamic SQL tag。
+- 高亮 MyBatis `#{}` 與 `${}` placeholder。
+- 提供常用 MyBatis annotation text block 與 dynamic SQL tag snippets。
+- 不需要 Language Server。
 
-## Supported Examples
+## 支援範例
 
 ```java
 package demo;
@@ -93,19 +93,19 @@ public interface UserMapper {
 }
 ```
 
-The main use case is automatic highlighting for MyBatis annotations without writing `/*sql*/`. The marker form is only a fallback for plain Java variables or cases where the annotation pattern is not enough.
+主要使用情境是 MyBatis annotation 自動辨識，不需要另外寫 `/*sql*/`。手動標記模式只是保留給一般 Java 變數，或 annotation 規則無法涵蓋的簡單情境。
 
-## Local Testing
+## 本機測試
 
-1. Open this folder in VS Code.
-2. Press `F5` to start an Extension Development Host.
-3. In the Extension Development Host, open a `.java` file.
-4. Paste the mapper example above.
-5. Confirm that SQL inside the matching Java text blocks receives SQL syntax highlighting.
+1. 用 VS Code 開啟這個資料夾。
+2. 按 `F5` 啟動 Extension Development Host。
+3. 在 Extension Development Host 視窗中開啟 `.java` 檔案。
+4. 貼上上方 Mapper 範例。
+5. 確認符合規則的 Java text block 內容有 SQL 語法高亮。
 
-## XML Entity Helpers
+## XML Entity 輔助功能
 
-When a Java text block contains both `<script>` and `</script>`, this extension can show decoded XML entities beside the source text:
+當 Java text block 同時包含 `<script>` 與 `</script>` 時，這個 extension 會在 XML entity 旁邊顯示解碼後的灰色提示：
 
 ```java
 @Select("""
@@ -117,9 +117,9 @@ When a Java text block contains both `<script>` and `</script>`, this extension 
 """)
 ```
 
-In this example, `&lt;` can show a gray `<` hint beside it.
+以上範例中的 `&lt;` 旁邊會顯示灰色的 `<` 提示。
 
-Inside a `<script>` text block, typing `<` or `&` can show completion items for:
+在 `<script>` text block 中輸入 `<` 或 `&` 時，會提供以下 XML entity completion：
 
 - `&lt;`
 - `&lt;=`
@@ -130,23 +130,23 @@ Inside a `<script>` text block, typing `<` or `&` can show completion items for:
 - `&quot;`
 - `&apos;`
 
-The command palette also includes:
+命令面板也提供：
 
 - `Java MyBatis Inline SQL: Encode XML Entities`
 - `Java MyBatis Inline SQL: Decode XML Entities`
 
-Select text first, then run one of these commands.
+請先選取文字，再執行上述命令。
 
-The extension reports warnings with quick fixes for XML characters that commonly break MyBatis `<script>` SQL:
+這個 extension 會針對 MyBatis `<script>` SQL 中常見、容易造成 XML 解析錯誤的字元顯示 warning，並提供 quick fix：
 
 - `<` -> `&lt;`
 - `<=` -> `&lt;=`
 - `&` -> `&amp;`
 - `&&` -> `&amp;&amp;`
 
-Quick fixes can replace a single unsafe operator, or encode all unsafe XML operators in the current `<script>` block while keeping MyBatis tags such as `<choose>` and `<when>` unchanged.
+Quick fix 可以只替換單一 unsafe operator，也可以一次轉換目前 `<script>` block 內所有需要 escape 的 XML operator，同時保留 `<choose>`、`<when>` 這類 MyBatis tag。
 
-The following forms are also available through completion and manual selection conversion, but are not reported as warnings by default because `>` is usually valid in XML text nodes:
+以下寫法也支援 completion 與選取文字後手動轉換，但預設不顯示 warning，因為 `>` 在 XML 文字節點中通常可以直接使用：
 
 - `>` -> `&gt;`
 - `>=` -> `&gt;=`
@@ -155,7 +155,7 @@ The following forms are also available through completion and manual selection c
 
 ## Snippets
 
-The extension contributes Java snippets for common MyBatis inline SQL patterns:
+這個 extension 提供以下 Java snippets：
 
 - `mbselect`
 - `mbscript`
@@ -165,47 +165,47 @@ The extension contributes Java snippets for common MyBatis inline SQL patterns:
 - `mbwhere`
 - `mbset`
 
-## Package and Install Locally
+## 本機打包與安裝
 
-Install `vsce` if needed:
+如果尚未安裝 `vsce`，先安裝：
 
 ```bash
 npm install -g @vscode/vsce
 ```
 
-Package the extension:
+打包 extension：
 
 ```bash
 vsce package
 ```
 
-Install the generated VSIX:
+安裝產生的 VSIX：
 
 ```bash
-code --install-extension java-mybatis-inline-sql-highlighter-0.0.7.vsix
+code --install-extension java-mybatis-inline-sql-highlighter-0.0.8.vsix
 ```
 
-Notes for packaging:
+打包注意事項：
 
-- Update the `repository.url` in `package.json` before publishing to the Marketplace.
-- The `.vscodeignore` file keeps the VSIX package small and avoids including generated `.vsix` files.
-- `LICENSE` is included so `vsce package` does not warn about a missing license file.
+- 發佈到 Marketplace 前，請先把 `package.json` 裡的 `repository.url` 改成實際 Git repository。
+- `.vscodeignore` 檔案會限制 VSIX 內只放必要檔案，避免把已產生的 `.vsix` 再包進去。
+- 專案已包含 `LICENSE`，因此 `vsce package` 不會再提示缺少授權檔案。
 
-## Limitations
+## 限制
 
-- This extension only provides syntax highlighting.
-- It is not a SQL formatter.
-- It is not a SQL validator.
-- It is not a MyBatis parser.
-- XML entity completion is limited to Java text blocks that contain both `<script>` and `</script>`.
-- MyBatis dynamic SQL tags are highlighted as TextMate patterns, not parsed as a full XML document.
-- It does not support `@SelectProvider`, `@InsertProvider`, `@UpdateProvider`, or `@DeleteProvider`.
-- It does not support `@Select({"SELECT ..."})`, string concatenation, variables, or constants such as `@Select(SQL_FIND_USER)`.
-- MyBatis placeholders such as `#{userId}` and `${name}` are left as normal SQL text.
-- Java text blocks require Java 15+, or a project setup that supports text blocks.
-- Java compilation still depends on your Java, Maven, Gradle, and IDE settings.
+- 這個 extension 只提供語法高亮。
+- 它不是 SQL formatter。
+- 它不是 SQL validator。
+- 它不是 MyBatis parser。
+- XML entity completion 只會在同時包含 `<script>` 與 `</script>` 的 Java text block 中啟用。
+- MyBatis dynamic SQL tag 是透過 TextMate pattern 高亮，不是完整 XML parser。
+- 不支援 `@SelectProvider`、`@InsertProvider`、`@UpdateProvider` 或 `@DeleteProvider`。
+- 不支援 `@Select({"SELECT ..."})`、字串相加、變數或常數，例如 `@Select(SQL_FIND_USER)`。
+- MyBatis placeholder，例如 `#{userId}` 與 `${name}`，目前會維持 SQL 文字處理，不做特別解析。
+- Java text block 需要 Java 15+，或專案本身已設定可使用 text block。
+- Java 是否能成功編譯，仍取決於你的 Java、Maven、Gradle 與 IDE 設定。
 
-TextMate grammars are regex based and are not full parsers. The annotation pattern is intentionally simple and targets direct annotation usage such as:
+TextMate grammar 是以 regex 為基礎，不是完整 parser。annotation 規則刻意維持簡單，目標支援直接寫法：
 
 ```java
 @Select("""
@@ -214,7 +214,7 @@ TextMate grammars are regex based and are not full parsers. The annotation patte
 """)
 ```
 
-and:
+以及換行寫法：
 
 ```java
 @Select(
@@ -225,8 +225,8 @@ and:
 )
 ```
 
-If a Java expression appears between the annotation parenthesis and the text block, this extension will not treat it as embedded SQL.
+如果 annotation 的括號與 text block 之間出現複雜 Java expression，這個 extension 不會把它當成嵌入 SQL。
 
-## Notes
+## 備註
 
-The `/*sql*/` marker is a Java comment. It is not included in the compiled Java string.
+`/*sql*/` 標記是 Java 註解，編譯後不會進入 Java 字串內容。

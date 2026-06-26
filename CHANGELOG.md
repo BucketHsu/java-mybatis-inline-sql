@@ -1,41 +1,46 @@
-# Changelog
+# 變更紀錄
 
-[English](CHANGELOG.md) | [繁體中文](CHANGELOG.zh-TW.md)
+[繁體中文](CHANGELOG.md) | [English](CHANGELOG.en.md)
+
+## 0.0.8
+
+- 將 Marketplace 預設 README 與 CHANGELOG 調整為繁體中文。
+- 新增英文版 README.en.md 與 CHANGELOG.en.md 供語言切換。
 
 ## 0.0.7
 
-- Highlight MyBatis dynamic SQL tags and tag attributes inside inline SQL text blocks.
-- Highlight MyBatis `#{}` and `${}` placeholders.
-- Add Java snippets for common MyBatis annotation text blocks and dynamic SQL tags.
-- Add a quick fix to encode all unsafe XML operators in the current `<script>` block.
+- 在 inline SQL text block 中高亮 MyBatis dynamic SQL tag 與 tag attribute。
+- 高亮 MyBatis `#{}` 與 `${}` placeholder。
+- 新增常用 MyBatis annotation text block 與 dynamic SQL tag Java snippets。
+- 新增 quick fix，可一次轉換目前 `<script>` block 內所有需要 escape 的 XML operator。
 
 ## 0.0.6
 
-- Polish Marketplace metadata, display name, keywords, and gallery banner.
-- Update local install documentation for the 0.0.6 VSIX package.
-- Align diagnostic source name with the published extension name.
+- 調整 Marketplace metadata、display name、keywords 與 gallery banner。
+- 更新本機安裝文件中的 0.0.6 VSIX 檔名。
+- 將 diagnostics source 名稱調整為與發佈後 extension 名稱一致。
 
 ## 0.0.5
 
-- Maintenance release.
+- 維護版發佈。
 
 ## 0.0.4
 
-- Sanitize documentation examples to use generic table, column, and parameter names.
+- 將文件範例改為通用的資料表、欄位與參數名稱，避免使用特定環境資訊。
 
 ## 0.0.3
 
-- Add diagnostics and quick fixes for raw `<`, `<=`, `&`, and `&&` inside MyBatis `<script>` text blocks.
-- Keep `>`, `>=`, `"`, and `'` available through completion and manual selection conversion without warning by default.
+- 在 MyBatis `<script>` text block 中，針對裸 `<`、`<=`、`&`、`&&` 新增 diagnostics 與 quick fix。
+- `>`、`>=`、`"`、`'` 保留 completion 與選取文字後手動轉換，預設不顯示 warning。
 
 ## 0.0.2
 
-- Show decoded XML entity hints inside Java text blocks wrapped with `<script>`.
-- Add XML entity completion and selection encode/decode commands for `<script>` text blocks.
-- Improve decoded hints for operators such as `&lt;=` and `&gt;=`.
+- 在 `<script>` 包住的 Java text block 中，於 XML entity 旁邊顯示解碼提示。
+- 新增 `<script>` text block 內的 XML entity completion，以及選取文字後轉換 / 還原 XML entity 的命令。
+- 改善 `&lt;=` 與 `&gt;=` 這類運算子的解碼提示顯示。
 
 ## 0.0.1
 
-- Initial release.
-- Highlight SQL inside Java MyBatis @Select, @Insert, @Update, and @Delete text blocks.
-- Highlight SQL inside Java text blocks marked with /*sql*/.
+- 初版發佈。
+- 高亮 Java MyBatis `@Select`、`@Insert`、`@Update`、`@Delete` text block 內的 SQL。
+- 高亮以 `/*sql*/` 標記的 Java text block 內的 SQL。
