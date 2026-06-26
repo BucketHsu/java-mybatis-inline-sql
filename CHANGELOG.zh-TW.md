@@ -2,6 +2,10 @@
 
 [English](CHANGELOG.md) | [繁體中文](CHANGELOG.zh-TW.md)
 
+## 0.0.4
+
+- 將文件範例改為通用的資料表、欄位與參數名稱，避免使用特定環境資訊。
+
 ## 0.0.3
 
 - 在 MyBatis `<script>` text block 中，針對裸 `<`、`<=`、`&`、`&&` 新增 diagnostics 與 quick fix。

@@ -36,53 +36,53 @@ import org.apache.ibatis.annotations.Update;
 public interface UserMapper {
 
     @Select("""
-        SELECT isStop
-        FROM SYSSA_USER
-        WHERE EMPNO = #{empno}
+        SELECT active
+        FROM APP_USER
+        WHERE USER_ID = #{userId}
     """)
-    String getIsStop(@Param("empno") String empno);
+    String getActiveFlag(@Param("userId") String userId);
 
     @Insert("""
-        INSERT INTO SYSSA_USER (EMPNO, USER_NAME)
-        VALUES (#{empno}, #{userName})
+        INSERT INTO APP_USER (USER_ID, DISPLAY_NAME)
+        VALUES (#{userId}, #{displayName})
     """)
     int insertUser(User user);
 
     @Update(
         """
-        UPDATE SYSSA_USER
-        SET isStop = #{isStop}
-        WHERE EMPNO = #{empno}
+        UPDATE APP_USER
+        SET active = #{active}
+        WHERE USER_ID = #{userId}
         """
     )
     int updateUser(User user);
 
     @Delete("""
-        DELETE FROM SYSSA_USER
-        WHERE EMPNO = #{empno}
+        DELETE FROM APP_USER
+        WHERE USER_ID = #{userId}
     """)
-    int deleteUser(@Param("empno") String empno);
+    int deleteUser(@Param("userId") String userId);
 
     default String manualSql() {
         String sql = /* sql */"""
             SELECT *
-            FROM SYSSA_USER
-            WHERE EMPNO = #{empno}
+            FROM APP_USER
+            WHERE USER_ID = #{userId}
         """;
         return sql;
     }
 
     @Select(/*sql*/"""
         SELECT *
-        FROM SYSSA_USER
-        WHERE EMPNO = #{empno}
+        FROM APP_USER
+        WHERE USER_ID = #{userId}
     """)
-    String query(@Param("empno") String empno);
+    String query(@Param("userId") String userId);
 
     @Select("""
         <script>
         SELECT *
-        FROM SYSSA_USER
+        FROM APP_USER
         WHERE CREATE_TIME &lt; #{beforeTime}
         </script>
     """)
@@ -108,7 +108,7 @@ When a Java text block contains both `<script>` and `</script>`, this extension 
 @Select("""
     <script>
     SELECT *
-    FROM SYSSA_USER
+    FROM APP_USER
     WHERE CREATE_TIME &lt; #{beforeTime}
     </script>
 """)
@@ -165,7 +165,7 @@ vsce package
 Install the generated VSIX:
 
 ```bash
-code --install-extension java-mybatis-inline-sql-0.0.3.vsix
+code --install-extension java-mybatis-inline-sql-highlighter-0.0.4.vsix
 ```
 
 Notes for packaging:
@@ -183,7 +183,7 @@ Notes for packaging:
 - XML entity completion is limited to Java text blocks that contain both `<script>` and `</script>`.
 - It does not support `@SelectProvider`, `@InsertProvider`, `@UpdateProvider`, or `@DeleteProvider`.
 - It does not support `@Select({"SELECT ..."})`, string concatenation, variables, or constants such as `@Select(SQL_FIND_USER)`.
-- MyBatis placeholders such as `#{empno}` and `${name}` are left as normal SQL text.
+- MyBatis placeholders such as `#{userId}` and `${name}` are left as normal SQL text.
 - Java text blocks require Java 15+, or a project setup that supports text blocks.
 - Java compilation still depends on your Java, Maven, Gradle, and IDE settings.
 
@@ -192,7 +192,7 @@ TextMate grammars are regex based and are not full parsers. The annotation patte
 ```java
 @Select("""
     SELECT *
-    FROM SYSSA_USER
+    FROM APP_USER
 """)
 ```
 
@@ -202,7 +202,7 @@ and:
 @Select(
     """
     SELECT *
-    FROM SYSSA_USER
+    FROM APP_USER
     """
 )
 ```

@@ -2,6 +2,10 @@
 
 [English](CHANGELOG.md) | [繁體中文](CHANGELOG.zh-TW.md)
 
+## 0.0.4
+
+- Sanitize documentation examples to use generic table, column, and parameter names.
+
 ## 0.0.3
 
 - Add diagnostics and quick fixes for raw `<`, `<=`, `&`, and `&&` inside MyBatis `<script>` text blocks.
