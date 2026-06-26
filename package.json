@@ -1,0 +1,32 @@
+{
+  "name": "java-mybatis-inline-sql",
+  "displayName": "Java MyBatis Inline SQL",
+  "description": "Highlight SQL inside Java MyBatis annotation text blocks.",
+  "version": "0.0.1",
+  "publisher": "local",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-name/java-mybatis-inline-sql.git"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "grammars": [
+      {
+        "scopeName": "inline.java-mybatis-sql",
+        "path": "./syntaxes/java-mybatis-inline-sql.tmLanguage.json",
+        "injectTo": [
+          "source.java"
+        ],
+        "embeddedLanguages": {
+          "meta.embedded.block.sql": "sql"
+        }
+      }
+    ]
+  }
+}

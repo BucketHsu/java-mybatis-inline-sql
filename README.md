@@ -1,0 +1,152 @@
+# Java MyBatis Inline SQL
+
+[English](README.md) | [繁體中文](README.zh-TW.md)
+
+Highlight SQL inside Java MyBatis annotation text blocks.
+
+This extension is a VS Code TextMate grammar injection for Java files. It injects SQL highlighting into Java text blocks used directly in MyBatis mapper annotations, and also supports an optional manual `/*sql*/` marker.
+
+## Features
+
+- Highlights SQL inside Java text blocks passed directly to:
+  - `@Select`
+  - `@Insert`
+  - `@Update`
+  - `@Delete`
+- Highlights SQL inside Java text blocks marked with `/*sql*/`, `/* sql */`, or `/*   sql   */`.
+- Works through TextMate grammar injection into `source.java`.
+- Does not require a language server or extension runtime code.
+
+## Supported Examples
+
+```java
+package demo;
+
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
+public interface UserMapper {
+
+    @Select("""
+        SELECT isStop
+        FROM SYSSA_USER
+        WHERE EMPNO = #{empno}
+    """)
+    String getIsStop(@Param("empno") String empno);
+
+    @Insert("""
+        INSERT INTO SYSSA_USER (EMPNO, USER_NAME)
+        VALUES (#{empno}, #{userName})
+    """)
+    int insertUser(User user);
+
+    @Update(
+        """
+        UPDATE SYSSA_USER
+        SET isStop = #{isStop}
+        WHERE EMPNO = #{empno}
+        """
+    )
+    int updateUser(User user);
+
+    @Delete("""
+        DELETE FROM SYSSA_USER
+        WHERE EMPNO = #{empno}
+    """)
+    int deleteUser(@Param("empno") String empno);
+
+    default String manualSql() {
+        String sql = /* sql */"""
+            SELECT *
+            FROM SYSSA_USER
+            WHERE EMPNO = #{empno}
+        """;
+        return sql;
+    }
+
+    @Select(/*sql*/"""
+        SELECT *
+        FROM SYSSA_USER
+        WHERE EMPNO = #{empno}
+    """)
+    String query(@Param("empno") String empno);
+}
+```
+
+The main use case is automatic highlighting for MyBatis annotations without writing `/*sql*/`. The marker form is only a fallback for plain Java variables or cases where the annotation pattern is not enough.
+
+## Local Testing
+
+1. Open this folder in VS Code.
+2. Press `F5` to start an Extension Development Host.
+3. In the Extension Development Host, open a `.java` file.
+4. Paste the mapper example above.
+5. Confirm that SQL inside the matching Java text blocks receives SQL syntax highlighting.
+
+## Package and Install Locally
+
+Install `vsce` if needed:
+
+```bash
+npm install -g @vscode/vsce
+```
+
+Package the extension:
+
+```bash
+vsce package
+```
+
+Install the generated VSIX:
+
+```bash
+code --install-extension java-mybatis-inline-sql-0.0.1.vsix
+```
+
+Notes for packaging:
+
+- Update the `repository.url` in `package.json` before publishing to the Marketplace.
+- The `files` field keeps the VSIX package small and avoids including generated `.vsix` files.
+- `LICENSE` is included so `vsce package` does not warn about a missing license file.
+
+## Limitations
+
+- This extension only provides syntax highlighting.
+- It is not a SQL formatter.
+- It is not a SQL validator.
+- It is not a MyBatis parser.
+- It does not provide autocomplete.
+- It does not support `@SelectProvider`, `@InsertProvider`, `@UpdateProvider`, or `@DeleteProvider`.
+- It does not support `@Select({"SELECT ..."})`, string concatenation, variables, or constants such as `@Select(SQL_FIND_USER)`.
+- MyBatis placeholders such as `#{empno}` and `${name}` are left as normal SQL text.
+- Java text blocks require Java 15+, or a project setup that supports text blocks.
+- Java compilation still depends on your Java, Maven, Gradle, and IDE settings.
+
+TextMate grammars are regex based and are not full parsers. The annotation pattern is intentionally simple and targets direct annotation usage such as:
+
+```java
+@Select("""
+    SELECT *
+    FROM SYSSA_USER
+""")
+```
+
+and:
+
+```java
+@Select(
+    """
+    SELECT *
+    FROM SYSSA_USER
+    """
+)
+```
+
+If a Java expression appears between the annotation parenthesis and the text block, this extension will not treat it as embedded SQL.
+
+## Notes
+
+The `/*sql*/` marker is a Java comment. It is not included in the compiled Java string.

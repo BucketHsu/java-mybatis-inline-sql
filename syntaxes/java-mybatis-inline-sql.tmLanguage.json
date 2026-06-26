@@ -1,0 +1,73 @@
+{
+  "scopeName": "inline.java-mybatis-sql",
+  "injectionSelector": "L:source.java",
+  "patterns": [
+    {
+      "include": "#mybatis-annotation"
+    },
+    {
+      "include": "#sql-marker"
+    }
+  ],
+  "repository": {
+    "mybatis-annotation": {
+      "name": "meta.annotation.mybatis.java",
+      "begin": "(@(?:Select|Insert|Update|Delete)\\b)(\\s*)(\\()",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.name.function.annotation.java"
+        },
+        "3": {
+          "name": "punctuation.section.parens.begin.java"
+        }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.parens.end.java"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#sql-text-block"
+        }
+      ]
+    },
+    "sql-marker": {
+      "name": "meta.sql.marker.java",
+      "begin": "(/\\*\\s*sql\\s*\\*/)",
+      "beginCaptures": {
+        "1": {
+          "name": "comment.block.java"
+        }
+      },
+      "end": "(?!\"\"\")(?=\\S)",
+      "patterns": [
+        {
+          "include": "#sql-text-block"
+        }
+      ]
+    },
+    "sql-text-block": {
+      "name": "meta.embedded.block.sql.java",
+      "begin": "\"\"\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.java"
+        }
+      },
+      "end": "\"\"\"",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.java"
+        }
+      },
+      "contentName": "meta.embedded.block.sql",
+      "patterns": [
+        {
+          "include": "source.sql"
+        }
+      ]
+    }
+  }
+}
