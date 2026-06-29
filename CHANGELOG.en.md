@@ -2,6 +2,10 @@
 
 [繁體中文](CHANGELOG.md) | [English](CHANGELOG.en.md)
 
+## 0.0.9
+
+- Add a demo GIF near the beginning of the README to show the extension in action.
+
 ## 0.0.8
 
 - Use Traditional Chinese as the default Marketplace README and CHANGELOG.
