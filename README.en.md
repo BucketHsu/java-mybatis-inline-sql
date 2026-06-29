@@ -4,6 +4,8 @@
 
 Highlight SQL inside Java MyBatis annotation text blocks.
 
+![Java MyBatis Inline SQL demo](images/java-mybatis-extension-demo.gif)
+
 This extension uses a VS Code TextMate grammar injection for Java files. It injects SQL highlighting into Java text blocks used directly in MyBatis mapper annotations, and also supports an optional manual `/*sql*/` marker.
 
 It also includes a small runtime feature for MyBatis `<script>` text blocks: XML entities such as `&lt;` can show their decoded character in gray text, and completion items can help insert XML entity forms.
@@ -182,7 +184,7 @@ vsce package
 Install the generated VSIX:
 
 ```bash
-code --install-extension java-mybatis-inline-sql-highlighter-0.0.8.vsix
+code --install-extension java-mybatis-inline-sql-highlighter-0.0.9.vsix
 ```
 
 Notes for packaging:

@@ -2,7 +2,7 @@
   "name": "java-mybatis-inline-sql-highlighter",
   "displayName": "Java MyBatis Inline SQL Highlighter",
   "description": "Highlight SQL inside Java MyBatis annotation text blocks.",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "publisher": "BucketHsu",
   "license": "MIT",
   "main": "./extension.js",

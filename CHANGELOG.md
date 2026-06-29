@@ -2,6 +2,10 @@
 
 [繁體中文](CHANGELOG.md) | [English](CHANGELOG.en.md)
 
+## 0.0.9
+
+- 在 README 開頭新增功能展示 GIF，讓使用者能快速了解 extension 用途。
+
 ## 0.0.8
 
 - 將 Marketplace 預設 README 與 CHANGELOG 調整為繁體中文。

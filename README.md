@@ -4,6 +4,8 @@
 
 在 Java MyBatis annotation 的 text block 內提供 SQL 語法高亮。
 
+![Java MyBatis Inline SQL 功能展示](images/java-mybatis-extension-demo.gif)
+
 這個 extension 使用 VS Code TextMate grammar injection。它會在 Java 檔案中，將直接寫在 MyBatis mapper annotation 裡的 Java text block 當成 SQL 高亮；同時也保留選用的 `/*sql*/` 手動標記模式。
 
 它也包含一個很小的 runtime 功能：在 MyBatis `<script>` text block 裡，像 `&lt;` 這類 XML entity 可以在旁邊顯示灰色的解碼結果，也可以透過 completion 輔助輸入 XML entity。
@@ -182,7 +184,7 @@ vsce package
 安裝產生的 VSIX：
 
 ```bash
-code --install-extension java-mybatis-inline-sql-highlighter-0.0.8.vsix
+code --install-extension java-mybatis-inline-sql-highlighter-0.0.9.vsix
 ```
 
 打包注意事項：
