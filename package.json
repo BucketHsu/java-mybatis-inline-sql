@@ -2,10 +2,15 @@
   "name": "java-mybatis-inline-sql-highlighter",
   "displayName": "Java MyBatis Inline SQL Highlighter",
   "description": "Highlight SQL inside Java MyBatis annotation text blocks.",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "publisher": "BucketHsu",
   "license": "MIT",
-  "main": "./extension.js",
+  "main": "./out/extension.js",
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile"
+  },
   "icon": "images/icon.png",
   "activationEvents": [
     "onLanguage:java",
@@ -18,6 +23,11 @@
   },
   "engines": {
     "vscode": "^1.90.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^7.0.2"
   },
   "categories": [
     "Programming Languages"

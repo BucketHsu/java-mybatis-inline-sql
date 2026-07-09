@@ -1,6 +1,12 @@
-const vscode = require("vscode");
+import * as vscode from "vscode";
 
-const ENTITIES = [
+interface EntityInfo {
+  entity: string;
+  char: string;
+  label: string;
+}
+
+const ENTITIES: EntityInfo[] = [
   { entity: "&lt;", char: "<", label: "less than" },
   { entity: "&gt;", char: ">", label: "greater than" },
   { entity: "&amp;", char: "&", label: "ampersand" },
@@ -8,10 +14,17 @@ const ENTITIES = [
   { entity: "&apos;", char: "'", label: "single quote" }
 ];
 
-const ENTITY_TO_CHAR = new Map(ENTITIES.map((item) => [item.entity, item.char]));
-const CHAR_TO_ENTITY = new Map(ENTITIES.map((item) => [item.char, item.entity]));
+const ENTITY_TO_CHAR = new Map<string, string>(ENTITIES.map((item) => [item.entity, item.char]));
+const CHAR_TO_ENTITY = new Map<string, string>(ENTITIES.map((item) => [item.char, item.entity]));
 const EXTENSION_ID = "java-mybatis-inline-sql-highlighter";
-const ENTITY_COMPLETIONS = [
+
+interface CompletionInfo {
+  insertText: string;
+  detail: string;
+  documentation: string;
+}
+
+const ENTITY_COMPLETIONS: CompletionInfo[] = [
   { insertText: "&lt;", detail: "XML entity for <", documentation: "Less than." },
   { insertText: "&lt;=", detail: "XML entity for <=", documentation: "Less than or equal." },
   { insertText: "&gt;", detail: "XML entity for >", documentation: "Greater than." },
@@ -22,10 +35,15 @@ const ENTITY_COMPLETIONS = [
   { insertText: "&apos;", detail: "XML entity for single quote", documentation: "Single quote." }
 ];
 
-let entityDecorationType;
-let diagnosticCollection;
+let entityDecorationType: vscode.TextEditorDecorationType;
+let diagnosticCollection: vscode.DiagnosticCollection;
 
-function activate(context) {
+/**
+ * Activates the extension.
+ *
+ * @param {vscode.ExtensionContext} context extension context
+ */
+export function activate(context: vscode.ExtensionContext): void {
   entityDecorationType = vscode.window.createTextEditorDecorationType({
     after: {
       margin: "0 0 0 0.35em",
@@ -82,10 +100,26 @@ function activate(context) {
   vscode.workspace.textDocuments.forEach(updateXmlEntityDiagnostics);
 }
 
-function deactivate() {}
+/**
+ * Deactivates the extension.
+ */
+export function deactivate(): void {}
 
-class XmlEntityCompletionProvider {
-  provideCompletionItems(document, position) {
+/**
+ * XML Entity Completion Item Provider.
+ */
+class XmlEntityCompletionProvider implements vscode.CompletionItemProvider {
+  /**
+   * Provides completion items.
+   *
+   * @param {vscode.TextDocument} document current document
+   * @param {vscode.Position} position current position
+   * @returns {vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList>} list of completion items
+   */
+  public provideCompletionItems(
+    document: vscode.TextDocument,
+    position: vscode.Position
+  ): vscode.ProviderResult<vscode.CompletionItem[]> {
     if (document.languageId !== "java" || !isInsideScriptTextBlock(document, position)) {
       return undefined;
     }
@@ -109,10 +143,25 @@ class XmlEntityCompletionProvider {
   }
 }
 
-class XmlEntityCodeActionProvider {
-  provideCodeActions(document, range, context) {
-    const actions = [];
-    const blockActionKeys = new Set();
+/**
+ * XML Entity Code Action Provider.
+ */
+class XmlEntityCodeActionProvider implements vscode.CodeActionProvider {
+  /**
+   * Provides code actions.
+   *
+   * @param {vscode.TextDocument} document current document
+   * @param {vscode.Range | vscode.Selection} range selected range
+   * @param {vscode.CodeActionContext} context code action context
+   * @returns {vscode.ProviderResult<vscode.CodeAction[]>} list of code actions
+   */
+  public provideCodeActions(
+    document: vscode.TextDocument,
+    range: vscode.Range | vscode.Selection,
+    context: vscode.CodeActionContext
+  ): vscode.ProviderResult<vscode.CodeAction[]> {
+    const actions: vscode.CodeAction[] = [];
+    const blockActionKeys = new Set<string>();
 
     for (const diagnostic of context.diagnostics) {
       if (diagnostic.source !== EXTENSION_ID || diagnostic.code !== "encode-xml-entity") {
@@ -177,7 +226,10 @@ class XmlEntityCodeActionProvider {
   }
 }
 
-function updateActiveEditorDecorations() {
+/**
+ * Updates decorations in active editor.
+ */
+function updateActiveEditorDecorations(): void {
   const editor = vscode.window.activeTextEditor;
   if (editor) {
     updateEntityDecorations(editor);
@@ -185,19 +237,24 @@ function updateActiveEditorDecorations() {
   }
 }
 
-function updateEntityDecorations(editor) {
+/**
+ * Updates XML entity decorations.
+ *
+ * @param {vscode.TextEditor} editor active editor
+ */
+function updateEntityDecorations(editor: vscode.TextEditor): void {
   if (editor.document.languageId !== "java") {
     editor.setDecorations(entityDecorationType, []);
     return;
   }
 
   const text = editor.document.getText();
-  const decorations = [];
+  const decorations: vscode.DecorationOptions[] = [];
 
   for (const block of findScriptTextBlocks(text)) {
     const content = text.slice(block.contentStart, block.contentEnd);
     const entityRegex = /&(lt|gt|amp|quot|apos);=?/g;
-    let match;
+    let match: RegExpExecArray | null;
 
     while ((match = entityRegex.exec(content)) !== null) {
       const sourceText = match[0];
@@ -226,12 +283,17 @@ function updateEntityDecorations(editor) {
   editor.setDecorations(entityDecorationType, decorations);
 }
 
-function updateXmlEntityDiagnostics(document) {
+/**
+ * Updates diagnostics for unsafe XML entities.
+ *
+ * @param {vscode.TextDocument} document document to update
+ */
+function updateXmlEntityDiagnostics(document: vscode.TextDocument): void {
   if (!diagnosticCollection || document.languageId !== "java") {
     return;
   }
 
-  const diagnostics = [];
+  const diagnostics: vscode.Diagnostic[] = [];
   const text = document.getText();
 
   for (const block of findScriptTextBlocks(text)) {
@@ -286,7 +348,21 @@ function updateXmlEntityDiagnostics(document) {
   diagnosticCollection.set(document.uri, diagnostics);
 }
 
-function createEntityDiagnostic(document, startOffset, length, message) {
+/**
+ * Creates a diagnostic for XML entities.
+ *
+ * @param {vscode.TextDocument} document document
+ * @param {number} startOffset start offset
+ * @param {number} length length of target text
+ * @param {string} message diagnostic message
+ * @returns {vscode.Diagnostic} generated diagnostic
+ */
+function createEntityDiagnostic(
+  document: vscode.TextDocument,
+  startOffset: number,
+  length: number,
+  message: string
+): vscode.Diagnostic {
   const diagnostic = new vscode.Diagnostic(
     new vscode.Range(
       document.positionAt(startOffset),
@@ -300,7 +376,12 @@ function createEntityDiagnostic(document, startOffset, length, message) {
   return diagnostic;
 }
 
-function replaceSelection(transform) {
+/**
+ * Replaces selection.
+ *
+ * @param {(text: string) => string} transform text transformation function
+ */
+function replaceSelection(transform: (text: string) => string): void {
   const editor = vscode.window.activeTextEditor;
   if (!editor || editor.document.languageId !== "java") {
     return;
@@ -318,13 +399,25 @@ function replaceSelection(transform) {
   });
 }
 
-function encodeXmlEntities(text) {
+/**
+ * Encodes XML entities.
+ *
+ * @param {string} text input text
+ * @returns {string} encoded text
+ */
+function encodeXmlEntities(text: string): string {
   return text.replace(/&(lt|gt|amp|quot|apos);|&(?!lt;|gt;|amp;|quot;|apos;)|[<>"']/g, (match) => {
     return ENTITY_TO_CHAR.has(match) ? match : CHAR_TO_ENTITY.get(match) || match;
   });
 }
 
-function encodeOperatorText(text) {
+/**
+ * Encodes operators into XML entities.
+ *
+ * @param {string} text input text
+ * @returns {string} encoded operator
+ */
+function encodeOperatorText(text: string): string {
   switch (text) {
     case "<=":
       return "&lt;=";
@@ -339,7 +432,13 @@ function encodeOperatorText(text) {
   }
 }
 
-function encodeUnsafeMyBatisScriptText(text) {
+/**
+ * Encodes unsafe MyBatis script text.
+ *
+ * @param {string} text input text
+ * @returns {string} encoded text
+ */
+function encodeUnsafeMyBatisScriptText(text: string): string {
   let result = "";
 
   for (let index = 0; index < text.length; index += 1) {
@@ -381,21 +480,45 @@ function encodeUnsafeMyBatisScriptText(text) {
   return result;
 }
 
-function decodeXmlEntities(text) {
+/**
+ * Decodes XML entities.
+ *
+ * @param {string} text input text
+ * @returns {string} decoded text
+ */
+function decodeXmlEntities(text: string): string {
   return text.replace(/&(lt|gt|amp|quot|apos);/g, (entity) => ENTITY_TO_CHAR.get(entity) || entity);
 }
 
-function isInsideScriptTextBlock(document, position) {
+/**
+ * Checks whether cursor is inside a script text block.
+ *
+ * @param {vscode.TextDocument} document document
+ * @param {vscode.Position} position position
+ * @returns {boolean} true if inside a script block
+ */
+function isInsideScriptTextBlock(document: vscode.TextDocument, position: vscode.Position): boolean {
   const offset = document.offsetAt(position);
   return findScriptTextBlocks(document.getText()).some((block) => {
     return offset >= block.contentStart && offset <= block.contentEnd;
   });
 }
 
-function findScriptTextBlocks(text) {
-  const blocks = [];
+interface ScriptBlock {
+  contentStart: number;
+  contentEnd: number;
+}
+
+/**
+ * Finds script text blocks.
+ *
+ * @param {string} text full text
+ * @returns {ScriptBlock[]} list of script blocks
+ */
+function findScriptTextBlocks(text: string): ScriptBlock[] {
+  const blocks: ScriptBlock[] = [];
   const textBlockRegex = /"""/g;
-  let begin;
+  let begin: RegExpExecArray | null;
 
   while ((begin = textBlockRegex.exec(text)) !== null) {
     const contentStart = begin.index + 3;
@@ -415,25 +538,41 @@ function findScriptTextBlocks(text) {
   return blocks;
 }
 
-function findScriptTextBlockAt(text, offset) {
+/**
+ * Finds script text block at specific offset.
+ *
+ * @param {string} text full text
+ * @param {number} offset offset
+ * @returns {ScriptBlock | undefined} script block if found
+ */
+function findScriptTextBlockAt(text: string, offset: number): ScriptBlock | undefined {
   return findScriptTextBlocks(text).find((block) => {
     return offset >= block.contentStart && offset <= block.contentEnd;
   });
 }
 
-function isKnownXmlEntity(text, index) {
+/**
+ * Checks whether entity is known XML entity.
+ *
+ * @param {string} text full text
+ * @param {number} index current index
+ * @returns {boolean} true if known
+ */
+function isKnownXmlEntity(text: string, index: number): boolean {
   return /^&(lt|gt|amp|quot|apos);/.test(text.slice(index));
 }
 
-function isXmlTagStart(text, index) {
+/**
+ * Checks whether index is at XML tag start.
+ *
+ * @param {string} text full text
+ * @param {number} index current index
+ * @returns {boolean} true if XML tag start
+ */
+function isXmlTagStart(text: string, index: number): boolean {
   const next = text[index + 1] || "";
   if (next === "/" || next === "!" || next === "?") {
     return true;
   }
   return /[A-Za-z_]/.test(next);
 }
-
-module.exports = {
-  activate,
-  deactivate
-};

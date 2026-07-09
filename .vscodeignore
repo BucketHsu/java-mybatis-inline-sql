@@ -4,8 +4,10 @@
 .vscode/
 .vscodeignore
 
+src/
+tsconfig.json
+
 node_modules/
-out/
 dist/
 coverage/
 
